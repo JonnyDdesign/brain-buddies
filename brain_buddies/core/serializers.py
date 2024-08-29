@@ -4,7 +4,7 @@ from .models import MathChallenge, CoinTransaction, Pet
 class MathChallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = MathChallenge
-        fields = '__all__'
+        fields = ['id', 'question', 'answer', 'difficulty', 'points']
 
 class CoinTransactionSerializer(serializers.ModelSerializer):
     class Meta:
