@@ -7,55 +7,60 @@ from kivy.uix.textinput import TextInput
 
 class BrainBuddiesApp(App):
     def build(self):
-        layout = BoxLayout(orientation='vertical')
+        self.layout = BoxLayout(orientation='vertical')
 
         # Initial Welcome Label
         self.label = Label(text="Welcome to Brain Buddies, [User's Name]!")
-        layout.add_widget(self.label)
+        self.layout.add_widget(self.label)
 
         # Math Challenge Button
-        math_button = Button(text="Start Math Challenge")
-        math_button.bind(on_press=self.start_math_challenge)
-        layout.add_widget(math_button)
+        self.math_button = Button(text="Start Math Challenge")
+        self.math_button.bind(on_press=self.start_math_challenge)
+        self.layout.add_widget(self.math_button)
 
         # Science Challenge Button
-        science_button = Button(text="Start Science Challenge")
-        science_button.bind(on_press=self.start_science_challenge)
-        layout.add_widget(science_button)
-
-        # Score Label (initially hidden)
-        self.score_label = Label(text="Score: 0")
-        self.score_label.opacity = 0
-        layout.add_widget(self.score_label)
+        self.science_button = Button(text="Start Science Challenge")
+        self.science_button.bind(on_press=self.start_science_challenge)
+        self.layout.add_widget(self.science_button)
 
         # Answer Input (initially hidden)
         self.answer_input = TextInput(hint_text="Enter your answer here", multiline=False)
-        self.answer_input.opacity = 0
-        layout.add_widget(self.answer_input)
+        self.answer_input.bind(on_text_validate=self.check_answer)
+
+        # Score Label (initially hidden)
+        self.score_label = Label(text="Score: 0")
 
         # Initialize state
         self.score = 0
         self.current_question_index = 0
-        self.question = []
+        self.questions = []
 
-        return layout
+        return self.layout
     
     def start_math_challenge(self, instance):
         # Update the screen for the math challenge
         self.label.text = "Math Challenge Started!"
-        self.show_challenge_ui()
+        self.clear_buttons()
+        self.layout.add_widget(self.answer_input)
+        self.layout.add_widget(self.score_label)
         self.fetch_questions('math')
 
     def start_science_challenge(self, instance):
         # Update the screen for the science challenge
         self.label.text = "Science Challenge Started!"
-        self.show_challenge_ui()
+        self.clear_buttons()
+        self.layout.add_widget(self.answer_input)
+        self.layout.add_widget(self.score_label)
         self.fetch_questions('science')
+
+    def clear_buttons(self):
+        self.layout.remove_widget(self.math_button)
+        self.layout.remove_widget(self.science_button)
     
     def fetch_questions(self, challenge_type):
         # Fetch questions from the Django API
         try:
-            response = requests.get(f'http://127.0.0.1:8000/api/{challenge_type}_challenges/')
+            response = requests.get(f'http://127.0.0.1:8000/api/{challenge_type}_challenges')
             response.raise_for_status()
             self.questions = response.json()
         except requests.exceptions.RequestException as e:
@@ -71,8 +76,6 @@ class BrainBuddiesApp(App):
         # Display the first question and prepare for user input
         current_question = self.questions[self.current_question_index]
         self.label.text = current_question["question"]
-        self.answer_input.text = ""
-        self.answer_input.bind(on_text_validate=self.check_answer)
 
     def check_answer(self, instance):
         user_answer = self.answer_input.text.strip().lower()
@@ -94,12 +97,7 @@ class BrainBuddiesApp(App):
         else:
             self.label.text = "Challenge Complete!"
             self.answer_input.unbind(on_text_validate=self.check_answer)
-    
-    def show_challenge_ui(self):
-        # Show the input field and score label when a challenge starts
-        self.score_label.opacity = 1
-        self.answer_input.opacity = 1
-        self.answer_input.focus = True
+            self.layout.remove_widget(self.answer_input)
 
 if __name__ == "__main__":
     BrainBuddiesApp().run()
