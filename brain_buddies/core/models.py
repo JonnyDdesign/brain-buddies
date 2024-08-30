@@ -10,6 +10,15 @@ class MathChallenge(models.Model):
     def __str__(self):
         return self.question
     
+class ScienceChallenge(models.Model):
+    question = models.CharField(max_length=255)
+    answer = models.CharField(max_length=255)
+    difficulty = models.CharField(max_length=50)
+    points = models.IntegerField(default=10)
+
+    def __str__(self):
+        return self.question
+    
 class CoinTransaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.IntegerField()
