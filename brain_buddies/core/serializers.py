@@ -1,9 +1,14 @@
 from rest_framework import serializers
-from .models import MathChallenge, CoinTransaction, Pet
+from .models import MathChallenge, ScienceChallenge, CoinTransaction, Pet
 
 class MathChallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = MathChallenge
+        fields = ['id', 'question', 'answer', 'difficulty', 'points']
+
+class ScienceChallengeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScienceChallenge
         fields = ['id', 'question', 'answer', 'difficulty', 'points']
 
 class CoinTransactionSerializer(serializers.ModelSerializer):
