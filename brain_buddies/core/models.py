@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class MathChallenge(models.Model):
     question = models.CharField(max_length=255)
-    answer = models.FloatField()
+    answer = models.IntegerField()
     difficulty = models.CharField(max_length=50)
     points = models.IntegerField(default=10)
 
