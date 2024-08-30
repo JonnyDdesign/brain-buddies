@@ -9,14 +9,8 @@ class BrainBuddiesApp(App):
     def build(self):
         layout = BoxLayout(orientation='vertical')
 
-        self.label = Label(text="Welcome to Brain Buddies!")
+        self.label = Label(text="Welcome to Brain Buddies, [User's Name]!")
         layout.add_widget(self.label)
-
-        self.score_label = Label(text="Score: 0")
-        layout.add_widget(self.score_label)
-
-        self.answer_input = TextInput(hint_text="Enter your answer here", multiline=False)
-        layout.add_widget(self.answer_input)
 
         # Math Challenge Button
         math_button = Button(text="Start Math Challenge")
@@ -35,9 +29,19 @@ class BrainBuddiesApp(App):
         return layout
     
     def start_math_challenge(self, instance):
+        # Update the screen for the math challenge
         self.label.text = "Math Challenge Started!"
+        self.fetch_questions('math')
+
+    def start_science_challenge(self, instance):
+        # Update the screen for the science challenge
+        self.label.text = "Science Challenge Started!"
+        self.fetch_questions('science')
+    
+    def fetch_questions(self, challenge_type):
+        # Fetch questions from the Django API
         try:
-            response = requests.get('http://127.0.0.1:8000/api/challenges')
+            response = requests.get(f'http://127.0.0.1:8000/api/{challenge_type}_challenges')
             response.raise_for_status()
             self.questions = response.json()
         except requests.exceptions.RequestException as e:
@@ -50,6 +54,7 @@ class BrainBuddiesApp(App):
             self.label.text = "No challenges available!"
 
     def display_question(self):
+        # Display the first question and prepare for user input
         current_question = self.questions[self.current_question_index]
         self.label.text = current_question["question"]
         self.answer_input.bind(on_text_validate=self.check_answer)
