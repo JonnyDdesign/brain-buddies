@@ -9,6 +9,7 @@ class BrainBuddiesApp(App):
     def build(self):
         layout = BoxLayout(orientation='vertical')
 
+        # Initial Welcome Label
         self.label = Label(text="Welcome to Brain Buddies, [User's Name]!")
         layout.add_widget(self.label)
 
@@ -22,6 +23,17 @@ class BrainBuddiesApp(App):
         science_button.bind(on_press=self.start_science_challenge)
         layout.add_widget(science_button)
 
+        # Score Label (initially hidden)
+        self.score_label = Label(text="Score: 0")
+        self.score_label.opacity = 0
+        layout.add_widget(self.score_label)
+
+        # Answer Input (initially hidden)
+        self.answer_input = TextInput(hint_text="Enter your answer here", multiline=False)
+        self.answer_input.opacity = 0
+        layout.add_widget(self.answer_input)
+
+        # Initialize state
         self.score = 0
         self.current_question_index = 0
         self.question = []
@@ -31,17 +43,19 @@ class BrainBuddiesApp(App):
     def start_math_challenge(self, instance):
         # Update the screen for the math challenge
         self.label.text = "Math Challenge Started!"
+        self.show_challenge_ui()
         self.fetch_questions('math')
 
     def start_science_challenge(self, instance):
         # Update the screen for the science challenge
         self.label.text = "Science Challenge Started!"
+        self.show_challenge_ui()
         self.fetch_questions('science')
     
     def fetch_questions(self, challenge_type):
         # Fetch questions from the Django API
         try:
-            response = requests.get(f'http://127.0.0.1:8000/api/{challenge_type}_challenges')
+            response = requests.get(f'http://127.0.0.1:8000/api/{challenge_type}_challenges/')
             response.raise_for_status()
             self.questions = response.json()
         except requests.exceptions.RequestException as e:
@@ -57,13 +71,14 @@ class BrainBuddiesApp(App):
         # Display the first question and prepare for user input
         current_question = self.questions[self.current_question_index]
         self.label.text = current_question["question"]
+        self.answer_input.text = ""
         self.answer_input.bind(on_text_validate=self.check_answer)
 
     def check_answer(self, instance):
-        user_answer = self.answer_input.text
+        user_answer = self.answer_input.text.strip().lower()
         current_question = self.questions[self.current_question_index]
 
-        if user_answer.strip().lower() == current_question["answer"].strip().lower():
+        if user_answer == current_question["answer"].strip().lower():
             self.label.text = "Correct!"
             self.score += current_question["points"]
         else:
@@ -80,8 +95,11 @@ class BrainBuddiesApp(App):
             self.label.text = "Challenge Complete!"
             self.answer_input.unbind(on_text_validate=self.check_answer)
     
-    def start_science_challenge(self, instance):
-        self.label.text = "Science Challenge Started!"
+    def show_challenge_ui(self):
+        # Show the input field and score label when a challenge starts
+        self.score_label.opacity = 1
+        self.answer_input.opacity = 1
+        self.answer_input.focus = True
 
 if __name__ == "__main__":
     BrainBuddiesApp().run()
