@@ -84,10 +84,13 @@ class BrainBuddiesApp(App):
 
     def check_answer(self, instance):
         try:
-            user_answer = self.answer_input.text.strip().lower()
+            user_answer = self.answer_input.text
             current_question = self.questions[self.current_question_index]
 
-            if user_answer == current_question["answer"].strip().lower():
+            correct_answer = str(current_question["answer"]).strip().lower()
+            user_answer = user_answer.strip().lower()
+
+            if user_answer == correct_answer:
                 self.label.text = "Correct!"
                 self.score += current_question["points"]
             else:
