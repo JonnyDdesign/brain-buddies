@@ -66,6 +66,7 @@ class BrainBuddiesApp(App):
         except requests.exceptions.RequestException as e:
             self.label.text = f"Error fetching challenges: {str(e)}"
             self.questions = []
+            return
 
         if self.questions:
             self.display_question()
@@ -73,31 +74,42 @@ class BrainBuddiesApp(App):
             self.label.text = "No challenges available!"
 
     def display_question(self):
-        # Display the first question and prepare for user input
-        current_question = self.questions[self.current_question_index]
-        self.label.text = current_question["question"]
+        if self.current_question_index < len(self.questions):
+            current_question = self.questions[self.current_question_index]
+            self.label.text = current_question["question"]
+            self.answer_input.bind(on_text_validate=self.check_answer)
+        else:
+            self.label.text = "No more questions available!"
+            self.end_challenge()
 
     def check_answer(self, instance):
-        user_answer = self.answer_input.text.strip().lower()
-        current_question = self.questions[self.current_question_index]
+        try:
+            user_answer = self.answer_input.text.strip().lower()
+            current_question = self.questions[self.current_question_index]
 
-        if user_answer == current_question["answer"].strip().lower():
-            self.label.text = "Correct!"
-            self.score += current_question["points"]
-        else:
-            self.label.text = "Try again!"
+            if user_answer == current_question["answer"].strip().lower():
+                self.label.text = "Correct!"
+                self.score += current_question["points"]
+            else:
+                self.label.text = "Try again!"
         
-        self.score_label.text = f"Score: {self.score}"
-        self.answer_input.text = ""
+            self.score_label.text = f"Score: {self.score}"
+            self.answer_input.text = ""
 
-        self.current_question_index += 1
+            self.current_question_index += 1
 
-        if self.current_question_index < len(self.questions):
-            self.display_question()
-        else:
-            self.label.text = "Challenge Complete!"
-            self.answer_input.unbind(on_text_validate=self.check_answer)
-            self.layout.remove_widget(self.answer_input)
+            if self.current_question_index < len(self.questions):
+                self.display_question()
+            else:
+                self.label.text = "Challenge Complete!"
+                self.end_challenge()
+        except Exception as e:
+                self.label.text = f"Error: {str(e)}"
+
+    def end_challenge(self):
+        self.answer_input.unbind(on_text_validate=self.check_answer)
+        self.layout.remove_widget(self.answer_input)
+        self.layout.remove_widget(self.score_label)
 
 if __name__ == "__main__":
     BrainBuddiesApp().run()
