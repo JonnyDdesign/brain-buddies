@@ -4,31 +4,62 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
+from kivy.core.window import Window
+from kivy.uix.floatlayout import FloatLayout
 
 class BrainBuddiesApp(App):
     def build(self):
-        self.layout = BoxLayout(orientation='vertical')
+        self.layout = BoxLayout(orientation='vertical', padding=40, spacing=20)
 
         # Initial Welcome Label
-        self.label = Label(text="Welcome to Brain Buddies, [User's Name]!")
+        self.label = Label(
+            text="Welcome to Brain Buddies, [User's Name]!",
+            font_size='24sp',
+            color=(0.2, 0.6, 0.86, 1),
+            bold=True,
+        )
         self.layout.add_widget(self.label)
 
         # Math Challenge Button
-        self.math_button = Button(text="Start Math Challenge")
+        self.math_button = Button(
+            text="Start Math Challenge",
+            size_hint=(1, 0.2),
+            background_color=(0.4, 0.7, 0.4, 1),
+            color=(1, 1, 1, 1),
+            font_size='20sp'
+        )
         self.math_button.bind(on_press=self.start_math_challenge)
         self.layout.add_widget(self.math_button)
 
         # Science Challenge Button
-        self.science_button = Button(text="Start Science Challenge")
+        self.science_button = Button(
+            text="Start Science Challenge",
+            size_hint=(1, 0.2),
+            background_color=(0.8, 0.5, 0.2, 1),
+            color=(1, 1, 1, 1),
+            font_size='20sp'
+        )
         self.science_button.bind(on_press=self.start_science_challenge)
         self.layout.add_widget(self.science_button)
 
         # Answer Input (initially hidden)
-        self.answer_input = TextInput(hint_text="Enter your answer here", multiline=False)
+        self.answer_input = TextInput(
+            hint_text="Enter your answer here",
+            multiline=False,
+            font_size='18sp',
+            foreground_color=(0, 0, 0, 1),
+            background_color=(0.9, 0.9, 0.9, 1),
+            padding=(10, 10)
+        )
         self.answer_input.bind(on_text_validate=self.check_answer)
 
         # Score Label (initially hidden)
-        self.score_label = Label(text="Score: 0")
+        self.score_label = Label(
+            text="Score: 0",
+            font_size='20sp',
+            color=(0.1, 0.5, 0.1, 1),
+            bold=True
+        )
 
         # Initialize state
         self.score = 0
