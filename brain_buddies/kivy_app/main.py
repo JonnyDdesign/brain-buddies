@@ -19,7 +19,7 @@ class MainScreen(Screen):
         outer_layout = BoxLayout(orientation='vertical', spacing=20)
 
         # Inner layout to place app name and slogan near top
-        top_layout = BoxLayout(orientation='vertical', padding=[30, 10, 30, 40], spacing=10, size_hint_y=None, height=300)
+        top_layout = BoxLayout(orientation='vertical', padding=[30, 10, 30, 40], spacing=10, size_hint_y=None, height=400)
         app_name = Label(
             text="Welcome to Brain Buddies!",
             font_size='36sp',
