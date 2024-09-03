@@ -7,44 +7,102 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.popup import Popup
 
-# Screen for user sign-in
-class SignInScreen(Screen):
+# Initial Screen (Sign In/Sign Up)
+class MainScreen(Screen):
     def __init__(self, **kwargs):
-        super(SignInScreen, self).__init__(**kwargs)
-        layout = BoxLayout(orientation='vertical', padding=20)
+        super().__init__(**kwargs)
+        self.orientation = 'vertical'
+        self.padding = [20, 50, 20, 50]
+        self.spacing = 20
 
-        self.username_input = TextInput(hint_text='Username', multiline=False)
-        self.password_input =TextInput(hint_text='Password', multiline=False, password=True)
+        # Outer layout to control overall screen layout
+        outer_layout = BoxLayout(orientation='vertical', spacing=20)
+
+        # Inner layout to place app name and slogan near top
+        top_layout = BoxLayout(orientation='vertical', padding=[30, 10, 30, 40], spacing=10, size_hint_y=None, height=300)
+        app_name = Label(
+            text="Welcome to Brain Buddies!",
+            font_size='36sp',
+            color=(0.2, 0.6, 0.8, 1),
+            size_hint=(None, None),
+            pos_hint={'center_x': 0.5}
+        )
+        slogan = Label(
+            text="Build your brain power and build your brain buddies!",
+            font_size='24sp',
+            color=(0.4, 0.7, 0.9, 1),
+            size_hint=(None, None),
+            pos_hint={'center_x': 0.5}
+        )
+        top_layout.add_widget(app_name)
+        top_layout.add_widget(slogan)
+
+        # Layout for input fields and buttons
+        layout = BoxLayout(orientation='vertical', padding=60, spacing=20)
+
+        # Username and Password Input Fields
+        self.username_input = TextInput(
+            hint_text="Username",
+            multiline=False,
+            size_hint=(None, None),
+            font_size=18,
+            width=600,
+            height=60,
+            pos_hint={'center_x': 0.5}
+        )
+        self.password_input = TextInput(
+            hint_text="Password",
+            multiline=False,
+            password=True,
+            size_hint=(None, None),
+            font_size=18,
+            width=600,
+            height=60,
+            pos_hint={'center_x': 0.5}
+        )
         layout.add_widget(self.username_input)
         layout.add_widget(self.password_input)
 
-        sign_in_button = Button(text="Sign In")
+        # Sign In Button
+        sign_in_button = Button(
+            text="Sign In",
+            size_hint=(None, None),
+            width=200,
+            height=50,
+            pos_hint={'center_x': 0.5}
+        )
         sign_in_button.bind(on_press=self.sign_in)
         layout.add_widget(sign_in_button)
 
-        sign_up_button = Button(text="Sign Up")
-        sign_up_button.bind(on_press=self.go_to_sign_up)
+        # Sign Up Button
+        sign_up_button = Button(
+            text="Sign Up",
+            size_hint=(None, None),
+            width=200,
+            height=50,
+            pos_hint={'center_x': 0.5}
+        )
+        sign_up_button.bind(on_press=self.sign_up)
         layout.add_widget(sign_up_button)
 
-        self.add_widget(layout)
+        # Add top layout and main layout to outer layout
+        outer_layout.add_widget(top_layout)
+        outer_layout.add_widget(layout)
+
+        self.add_widget(outer_layout)
 
     def sign_in(self, instance):
         username = self.username_input.text
         password = self.password_input.text
-        if username == 'test' and password == "password":
-            self.manager.current = 'main'
-            self.manager.get_screen('main').label.text = f"Welcome to Brain Buddies, {username}!"
+        if username == "test" and password == "password":
+            self.manager.current = 'home'
         else:
-            self.show_error("Invalid credentials!")
+            self.username_input.text = ""
+            self.password_input.text = ""
+            self.username_input.hint_text = "Invalid credentials, try again"
 
-    def go_to_sign_up(self, instance):
-        self.manager.current = 'sign_up'
-
-    def show_error(self, message):
-        popup = Popup(title='Error',
-                      content=Label(text=message),
-                      size_hint=(None, None), size=(400, 200))
-        popup.open()
+    def sign_up(self, instance):
+        print("Sign up clicked!")
 
 # Screen for user sign-up
 class SignUpScreen(Screen):
@@ -68,14 +126,14 @@ class SignUpScreen(Screen):
         self.manager.current = 'main'
         self.manager.get_screen('main').label.text = f"Welcome to Brain Buddies, {username}!"
 
-class MainScreen(Screen):
+class HomeScreen(Screen):
     def __init__(self, **kwargs):
-        super(MainScreen, self).__init__(**kwargs)
+        super(HomeScreen, self).__init__(**kwargs)
         self.layout = BoxLayout(orientation='vertical', padding=40, spacing=20)
 
         # Initial Welcome Label
         self.label = Label(
-            text="Welcome to Brain Buddies, [User's Name]!",
+            text="Welcome back, [User's Name]!",
             font_size='24sp',
             color=(0.2, 0.6, 0.86, 1),
             bold=True,
@@ -211,9 +269,9 @@ class MainScreen(Screen):
 class BrainBuddiesApp(App):
     def build(self):
         sm = ScreenManager()
-        sm.add_widget(SignInScreen(name='sign_in'))
-        sm.add_widget(SignUpScreen(name='sign_up'))
         sm.add_widget(MainScreen(name='main'))
+        sm.add_widget(HomeScreen(name='home'))
+        sm.add_widget(SignUpScreen(name='sign_up'))
         return sm
 
 if __name__ == "__main__":
